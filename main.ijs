@@ -1,4 +1,5 @@
-coinsert 'jgl2'
+require 'gles'
+coinsert 'jgl2 jgles'
 
 combp=: dyad define
 'a b c d'=. y['f g h'=. x
@@ -28,7 +29,7 @@ game_form=: noun define
 pc math24 closeok; pn "math-J"; minwh 500 500;
 bin h;
   bin v;
-    cc brd isidraw; set brd wh 256 256;
+    cc win isidraw; set win wh 256 256;
     bin h;
       cc sub edit center; set sub wh 180 25;
       cc new button; cn "new"; set new wh 50 30;
@@ -47,6 +48,21 @@ echo]NUMS=: /:~ 1 + ? 4 $ 13
 SOLS=: math24 NUMS
 SOLVED=: 0
 wd'set sub text ""'
+render_game''
+)
+
+render_game=: monad define
+wd'psel math24'
+glclear]glsel 'win'
+'a b c d'=. NUMS
+'w h'=. glqwh''
+
+NB. rather depp blue: 0 32 166
+glfill 255 255 189 255
+glfont '"lucida console" 30'
+gltextxy 60 100
+gltext ": NUMS
+glpaint''
 )
 
 NB. pressing go! starts a new game. it also submits a solution. if
@@ -60,19 +76,23 @@ if. NUMS check_24 expr do.
   echo expr,' = 24'
   echo 'other solutions:'
   echo SOLS
-  SOLVED =. 1
+  SOLVED=: 1
 elseif. 0=(#expr)+#SOLS do.
   echo 'indeed, no solutions!'
-  SOLVED =. 1
-else. echo 'wrong!' end.
+  SOLVED=: 1
+else.
+  echo 'wrong!'
+  SOLVED=: 0
+end.
 )
 
 math24_sub_button=: check_answer
 math24_new_button=: new_game
 
 mush=: verb define
-new_game''
-if. IFQT do. wd game_form[math24_close^:(wdisparent'math24')''
+if. IFQT do.
+  wd game_form[math24_close^:(wdisparent'math24')''
+  new_game''
 else. echo 'run through JQT' end.
 )
 
